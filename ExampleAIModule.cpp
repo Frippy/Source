@@ -6,8 +6,7 @@ BWTA::Region* home;
 BWTA::Region* enemy_base;
 std::vector<Unit*> mySCV; 
 std::vector<Unit*> myCC;
-int foo, foo2;
-bool foo3 = false;
+int machineShopTilePosX, machineShopTilePosY;
 int reservedMinerals;
 int reservedGas;
 std::vector<Unit*> supplyList;
@@ -84,17 +83,19 @@ TilePosition getBuildTile(Unit* builder, UnitType buildingType, TilePosition aro
 					if(!unitsInWay)
 					{
 						if(buildingType == UnitTypes::Terran_Factory){
-							if(Broodwar->canBuildHere(builder,TilePosition(i + buildingType.tileWidth(),j + buildingType.tileHeight()-UnitTypes::Terran_Machine_Shop.tileHeight()),UnitTypes::Terran_Machine_Shop,false))
+							if(Broodwar->canBuildHere(builder, TilePosition(i + buildingType.tileWidth(),j + buildingType.tileHeight()-UnitTypes::Terran_Machine_Shop.tileHeight()),UnitTypes::Terran_Machine_Shop,false))
 							{
-								foo = i; 
-								foo2 = j;
+								machineShopTilePosX = i + buildingType.tileWidth(); 
+								machineShopTilePosY = j + buildingType.tileHeight() - UnitTypes::Terran_Machine_Shop.tileHeight();
 								return TilePosition(i,j);
 							}
 						}
 						else
 						{
-							/*if(hasFactory)
-								if(TilePosition(i,j).*/
+							if(hasFactory && !hasMachineShop && i >= machineShopTilePosX && i < machineShopTilePosX + UnitTypes::Terran_Machine_Shop.tileWidth() && machineShopTilePosY + buildingType.tileHeight() > machineShopTilePosY && j < machineShopTilePosY + UnitTypes::Terran_Machine_Shop.tileHeight())
+							{
+								continue;
+							}
 							Broodwar->sendText("i %d j %d",i,j);
 							return TilePosition(i,j);
 						}
@@ -531,10 +532,6 @@ void ExampleAIModule::onFrame()
 	//Broodwar->sendText("%d",UnitTypes::Terran_Refinery.mineralPrice());
 	if(Broodwar->getFrameCount() % 50 == 0)
 		Broodwar->sendText("%d",reservedMinerals);
-	if(foo3)
-	{
-		foo4();
-	}
 	buildSCV();
 	buildSupplyDepot();
 	buildMarine();
